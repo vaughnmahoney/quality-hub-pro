@@ -4,21 +4,41 @@ import { createOptimoRouteApi } from "@/services/optimoRouteApi";
 import { Order } from "@/types/optimaflow";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-
-const api = createOptimoRouteApi("YOUR_API_KEY"); // We'll handle this properly later
+import { Loader2, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Dashboard() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const { toast } = useToast();
 
-  const { data: orders, isLoading } = useQuery({
+  const { data: orders, isLoading, error } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
-      // For demo, we'll fetch a single order
-      const response = await api.searchOrders(["DEMO_ORDER"]);
-      return response.orders;
+      try {
+        const api = createOptimoRouteApi(import.meta.env.VITE_OPTIMOROUTE_API_KEY || "");
+        const response = await api.searchOrders(["DEMO_ORDER"]);
+        return response.orders;
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+        toast({
+          variant: "destructive",
+          title: "Error fetching orders",
+          description: "Please check your API key and try again.",
+        });
+        throw err;
+      }
     },
   });
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <AlertCircle className="w-12 h-12 text-danger" />
+        <h2 className="text-xl font-semibold">Failed to load orders</h2>
+        <p className="text-gray-600">Please check your API key and try again</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
