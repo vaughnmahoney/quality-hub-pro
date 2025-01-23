@@ -10,16 +10,85 @@ import { useToast } from "@/components/ui/use-toast";
 
 const api = createOptimoRouteApi("YOUR_API_KEY"); // We'll handle this properly later
 
+// MOCK DATA - DELETE WHEN IMPLEMENTING REAL API
+const MOCK_ORDERS: Order[] = [
+  {
+    orderNo: "ORDER-001",
+    data: {
+      orderNo: "ORDER-001",
+      location: {
+        locationName: "Downtown Office Building",
+        locationNo: "LOC-001",
+        address: "123 Business Ave",
+        lat: 37.7749,
+        lng: -122.4194
+      },
+      notes: "Monthly maintenance check required. Check all HVAC units on floors 1-3.",
+      date: "2024-03-15"
+    },
+    scheduleInformation: {
+      driverName: "John Smith",
+      scheduledAtDt: "2024-03-15T09:00:00Z",
+      stopNumber: 1
+    }
+  },
+  {
+    orderNo: "ORDER-002",
+    data: {
+      orderNo: "ORDER-002",
+      location: {
+        locationName: "Sunset Mall",
+        locationNo: "LOC-002",
+        address: "789 Shopping Center Blvd",
+        lat: 37.7833,
+        lng: -122.4167
+      },
+      notes: "Emergency repair needed for escalator on second floor.",
+      date: "2024-03-15"
+    },
+    scheduleInformation: {
+      driverName: "Sarah Johnson",
+      scheduledAtDt: "2024-03-15T13:30:00Z",
+      stopNumber: 2
+    }
+  },
+  {
+    orderNo: "ORDER-003",
+    data: {
+      orderNo: "ORDER-003",
+      location: {
+        locationName: "Tech Park Building B",
+        locationNo: "LOC-003",
+        address: "456 Innovation Drive",
+        lat: 37.7833,
+        lng: -122.4167
+      },
+      notes: "Quarterly inspection of server room cooling systems.",
+      date: "2024-03-15"
+    },
+    scheduleInformation: {
+      driverName: "Mike Wilson",
+      scheduledAtDt: "2024-03-15T15:45:00Z",
+      stopNumber: 3
+    }
+  }
+];
+// END MOCK DATA
+
 export function Dashboard() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const { toast } = useToast();
 
+  // Keep the original query but use mock data for now
   const { data: orders, isLoading } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
-      // For demo, we'll fetch a single order
-      const response = await api.searchOrders(["DEMO_ORDER"]);
-      return response.orders;
+      // MOCK DATA RETURN - DELETE WHEN IMPLEMENTING REAL API
+      return MOCK_ORDERS;
+      
+      // Original API call - uncomment when implementing real API
+      // const response = await api.searchOrders(["DEMO_ORDER"]);
+      // return response.orders;
     },
   });
 
