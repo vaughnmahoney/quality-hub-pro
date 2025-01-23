@@ -7,9 +7,6 @@ export class OptimoRouteApi {
   private controller: AbortController;
 
   constructor(apiKey: string) {
-    if (!apiKey) {
-      throw new Error("OptimoRoute API key is required");
-    }
     this.apiKey = apiKey;
     this.controller = new AbortController();
   }
@@ -27,17 +24,13 @@ export class OptimoRouteApi {
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error("Rate limit exceeded. Please try again later.");
+          // Implement exponential backoff
+          throw new Error("Rate limit exceeded");
         }
         throw new Error(`API request failed: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error("API request was not successful");
-      }
-
-      return data;
+      return await response.json();
     } catch (error) {
       console.error("API request error:", error);
       throw error;
@@ -45,10 +38,6 @@ export class OptimoRouteApi {
   }
 
   async searchOrders(orderNumbers: string[]): Promise<{ success: boolean; orders: Order[] }> {
-    if (!orderNumbers.length) {
-      throw new Error("At least one order number is required");
-    }
-
     return this.request("/search_orders", {
       orders: orderNumbers.map(orderNo => ({ orderNo })),
       includeOrderData: true,
@@ -57,10 +46,6 @@ export class OptimoRouteApi {
   }
 
   async getOrderCompletion(orderNumbers: string[]): Promise<{ success: boolean; orders: OrderCompletion[] }> {
-    if (!orderNumbers.length) {
-      throw new Error("At least one order number is required");
-    }
-
     return this.request("/order_completion", {
       orders: orderNumbers.map(orderNo => ({ orderNo })),
     });
